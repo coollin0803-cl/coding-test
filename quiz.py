@@ -1,4 +1,4 @@
-import random
+import math
 
 
 def reverse_list(l: list):
@@ -32,6 +32,8 @@ print(reverse_list([1, 2, 3, 4, 5]))
 print(reverse_list([1, 2, "test", 4, {"x": 12}]))
 print("------Reversing list ends------")
 
+SODUKU_ARR = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 
 def solve_sudoku(matrix):
     """
@@ -40,13 +42,61 @@ def solve_sudoku(matrix):
     contains all digits from 1 to 9.
     Input: a 9x9 matrix representing the board.
     """
-    row = 0
-    col = 0
-    sudoku_array = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     for i in range(9):
         for j in range(9):
-            if matrix[i][j] not in sudoku_array:
-                matrix[i][j] = random.choice(sudoku_array)
+            if matrix[i][j] not in SODUKU_ARR:
+                for num in range(1, 10):
+                    if check(matrix, i, j, num):
+                        matrix[i][j] = num
+                        if solve_sudoku(matrix):
+                            return True
+                matrix[i][j] = 0
+                return False
+    return True
 
 
 pass
+
+
+def check(matrix, row, column, num):
+    # Check whether there is any value in the row equal to the num
+    for i in range(9):
+        if matrix[row][i] == num:
+            return False
+
+    # Check whether there is any value in the column equal to the num
+    for j in range(9):
+        if matrix[j][column] == num:
+            return False
+
+    # Judge which grid the num is located in
+    row_start = int(math.floor(row / 3)) * 3
+    column_start = int(math.floor(column / 3)) * 3
+
+    # Check whether there is any value in the 3*3-grid equal to the num
+    for i in range(row_start, row_start + 3):
+        for j in range(column_start, column_start + 3):
+            if matrix[i][j] == num:
+                return False
+    return True
+
+
+print("------sudoku starts------")
+matrix = [
+    [5, 3, 0, 0, 7, 0, 0, 0, 0],
+    [6, 0, 0, 1, 9, 5, 0, 0, 0],
+    [0, 9, 8, 0, 0, 0, 0, 6, 0],
+    [8, 0, 0, 0, 6, 0, 0, 0, 3],
+    [4, 0, 0, 8, 0, 3, 0, 0, 1],
+    [7, 0, 0, 0, 2, 0, 0, 0, 6],
+    [0, 6, 0, 0, 0, 0, 2, 8, 0],
+    [0, 0, 0, 4, 1, 9, 0, 0, 5],
+    [0, 0, 0, 0, 8, 0, 0, 7, 9]
+]
+for row in matrix:
+    print(row)
+print("------changed------")
+solve_sudoku(matrix)
+for row in matrix:
+    print(row)
+print("------sudoku ends------")
